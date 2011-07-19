@@ -4,7 +4,6 @@ var canvasHeight;
 var canvasWidth;
 var half_canvasHeight;
 var half_canvasWidth;
-var dateTemp;
 var lastTime;
 
 var x0 = 0;
@@ -40,8 +39,27 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 	this.v = v;
 	this.cosine = Math.cos(this.theta);
 	this.sine = Math.sin(this.theta);
+	this.dt = 0;
+	this.loop = false;
 
-	this.move = function() {
+	this.move = function(dt) {
+
+		if (this.loop) {
+			this.theta -= Math.PI / 12;
+			if (this.theta <= (-Math.PI * 2.0)) {
+				this.loop = false;
+				this.theta = 0;
+				console.log("stop loop");
+			}
+		}
+		else {
+			this.dt += dt;
+			if (this.dt >= 1000) {
+				this.loop = true;
+				this.dt = 0;
+			}
+		}
+
 		this.cosine = Math.cos(this.theta);
 		this.sine = Math.sin(this.theta);
 		this.x = this.v * this.cosine + this.x;
@@ -50,9 +68,12 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 		if (this.x > half_canvasWidth) {
 			this.x = -half_canvasWidth;
 		}
+
+		/*
 		else if (this.x < -half_canvasWidth) {
 			this.x = half_canvasWidth;
 		}
+		*/
 
 		if (this.y > half_canvasHeight) {
 			this.y = -half_canvasHeight;
@@ -60,6 +81,8 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 		else if (this.y < -half_canvasHeight) {
 			this.y = half_canvasHeight;
 		}
+
+		/*
 
 		if ((Math.random() * 100) < 60) {
 			if ((Math.random() * 10) < 5) {
@@ -69,6 +92,7 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 				this.theta -= Math.PI / 32;
 			}
 		}
+		*/
 	}
 
 	this.mirror = function(leader) {
@@ -95,13 +119,22 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 }
 
 function init() {
-	dateTemp = new Date();
+	var dateTemp = new Date();
 	lastTime = dateTemp.getTime();
-	f0 = new Flyer(0, 0, 0, "rgb(255, 0, 0)", 10, 0);
-	f1 = new Flyer(0, 20, 0, "rgb(255, 255, 0)", 10, 20);
+
+	console.log(lastTime);
+
+	f0 = new Flyer(-half_canvasWidth - 5, half_canvasHeight - 40, 
+			0, "rgb(255, 0, 0)", 10, 0);
+	f1 = new Flyer(-half_canvasWidth - 5, half_canvasHeight - 20,
+		       	0, "rgb(255, 255, 0)", 10, 20);
 }
 
 function animate() {
+	var dateTemp = new Date();
+	var curTime = dateTemp.getTime();
+	var delta = curTime - lastTime;
+	lastTime = curTime;
 
 	context.fillStyle = "rgb(0, 0, 0)";
 	context.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -109,7 +142,7 @@ function animate() {
 	f0.draw();
 	f1.draw();
 
-	f0.move();
+	f0.move(delta);
 	f1.mirror(f0);
 
 	setTimeout(animate, 33);
