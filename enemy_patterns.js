@@ -13,9 +13,10 @@ var y1 = 0;
 var dt = 0;
 var r = 20.0;
 
-var fliers;
-var f0;
-var f1;
+var fliers0;
+var fliers1;
+
+var numFliers = 10;
 
 $(document).ready(function() {
 	canvas = $("#myCanvas");
@@ -27,7 +28,6 @@ $(document).ready(function() {
 	init();
 	animate();
 });
-
 
 function Flyer(startX, startY, startTheta, color, v, r) {
 	
@@ -41,23 +41,20 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 	this.sine = Math.sin(this.theta);
 	this.dt = 0;
 	this.loop = false;
+	this.reset_loop = true;
 
-	this.move = function(dt) {
+	this.move = function() {
 
 		if (this.loop) {
-			this.theta -= Math.PI / 12;
+			this.theta -= Math.PI / 20;
 			if (this.theta <= (-Math.PI * 2.0)) {
 				this.loop = false;
 				this.theta = 0;
-				console.log("stop loop");
 			}
 		}
-		else {
-			this.dt += dt;
-			if (this.dt >= 1000) {
-				this.loop = true;
-				this.dt = 0;
-			}
+		else if (this.x > 0 && !this.loop && this.reset_loop) {
+			this.loop = true;
+			this.reset_loop = false;
 		}
 
 		this.cosine = Math.cos(this.theta);
@@ -66,14 +63,9 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 		this.y = this.v * this.sine + this.y;
 
 		if (this.x > half_canvasWidth) {
-			this.x = -half_canvasWidth;
+			this.x = -half_canvasWidth - 15;
+			this.reset_loop = true;
 		}
-
-		/*
-		else if (this.x < -half_canvasWidth) {
-			this.x = half_canvasWidth;
-		}
-		*/
 
 		if (this.y > half_canvasHeight) {
 			this.y = -half_canvasHeight;
@@ -81,18 +73,6 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 		else if (this.y < -half_canvasHeight) {
 			this.y = half_canvasHeight;
 		}
-
-		/*
-
-		if ((Math.random() * 100) < 60) {
-			if ((Math.random() * 10) < 5) {
-				this.theta += Math.PI / 32;
-			}
-			else {
-				this.theta -= Math.PI / 32;
-			}
-		}
-		*/
 	}
 
 	this.mirror = function(leader) {
@@ -122,12 +102,17 @@ function init() {
 	var dateTemp = new Date();
 	lastTime = dateTemp.getTime();
 
-	console.log(lastTime);
+	fliers0 = new Array();
+	fliers1 = new Array();
 
-	f0 = new Flyer(-half_canvasWidth - 5, half_canvasHeight - 40, 
+	for (var i=0; i<numFliers; i++) {
+		fliers0[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 40, 
 			0, "rgb(255, 0, 0)", 10, 0);
-	f1 = new Flyer(-half_canvasWidth - 5, half_canvasHeight - 20,
+
+		fliers1[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 20,
 		       	0, "rgb(255, 255, 0)", 10, 20);
+	}
+
 }
 
 function animate() {
@@ -139,11 +124,12 @@ function animate() {
 	context.fillStyle = "rgb(0, 0, 0)";
 	context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-	f0.draw();
-	f1.draw();
-
-	f0.move(delta);
-	f1.mirror(f0);
+	for (var i=0; i<numFliers; i++) {
+		fliers0[i].draw();
+		fliers1[i].draw();
+		fliers0[i].move();
+		fliers1[i].mirror(fliers0[i]);
+	}
 
 	setTimeout(animate, 33);
 }
