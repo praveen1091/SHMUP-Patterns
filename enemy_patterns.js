@@ -53,7 +53,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 250
+        "durration" : 20.0
     },
 
 
@@ -74,7 +74,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 250
+        "durration" : 20.0
     },
 
 
@@ -156,8 +156,8 @@ function Flyer(startX, startY, startTheta, color, v, r) {
             break;
            
             case TRANSLATE:
-            this.dt += dt;
             this.v = pattern[i]["v"];
+            this.dt += v;
             if (this.dt >= pattern[i]["durration"]) {
                 this.dt = 0;
                 this.cur_cmd++;
