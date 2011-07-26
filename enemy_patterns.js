@@ -24,30 +24,79 @@ const ROTATE = 1;
 const ROTATE_TRANSLATE = 2;
 const PAUSE = 3;
 const LOOP = 4;
+const ENTER_LEFT = 5;
+const EXIT_RIGHT = 6;
+const TRANSLATE_TO = 7;
 
 
 var pattern_0 = [
+
     {
-        "cmd" : TRANSLATE,
+        "cmd" : ENTER_LEFT,
         "v" : 10.0,
-        "durration" : 1000
+        "x" : 0
     },
+
+    {
+        "cmd" : TRANSLATE_TO,
+        "v" : 10.0,
+        "x" : 0
+    },
+
     {
         "cmd" : ROTATE,
         "v" : 10.0,
         "theta" : -Math.PI / 20,
-        "max" : -Math.PI
+        "max" : -Math.PI / 2 
     },
+
+    {
+        "cmd" : TRANSLATE,
+        "v" : 10.0,
+        "durration" : 250
+    },
+
+
     {
         "cmd" : ROTATE,
         "v" : 10.0,
         "theta" : Math.PI / 20,
-        "max" : Math.PI * 2
+        "max" : Math.PI / 2 
     },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : -Math.PI / 20,
+        "max" : -Math.PI / 2 
+    },
+
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 2000
+        "durration" : 250
+    },
+
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : Math.PI / 2 
+    },
+
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : -Math.PI / 20,
+        "max" : (-Math.PI * 2)
+    },
+
+    {
+        "cmd" : EXIT_RIGHT,
+        "v" : 10.0,
+        "x" : 0
     }
 ];
 
@@ -61,11 +110,13 @@ $(document).ready(function() {
     half_canvasWidth = canvasWidth / 2;
     init();
     animate();
+
+    pattern_0[0]["x"] = -half_canvasWidth;
+    pattern_0[5]["x"] = half_canvasWidth;
 });
 
-function Flyer(startX, startY, startTheta, color, v, r, modifier) {
+function Flyer(startX, startY, startTheta, color, v, r) {
    
-    this.modifier = modifier;
     this.x = startX;
     this.y = startY;
     this.theta = startTheta;
@@ -89,10 +140,25 @@ function Flyer(startX, startY, startTheta, color, v, r, modifier) {
 
         switch (pattern[i]["cmd"]) {
             
+            case ENTER_LEFT:
+            case EXIT_RIGHT:
+            this.v = pattern[i]["v"];
+            if (this.x >= pattern[i]["x"]) {
+                this.cur_cmd++;
+            }
+            break;
+
+            case TRANSLATE_TO:
+            this.v = pattern[i]["v"];
+            if (this.x >= pattern[i]["x"]) {
+                this.cur_cmd++;
+            }
+            break;
+           
             case TRANSLATE:
             this.dt += dt;
             this.v = pattern[i]["v"];
-            if (this.dt >= (pattern[i]["durration"] + this.modifier)) {
+            if (this.dt >= pattern[i]["durration"]) {
                 this.dt = 0;
                 this.cur_cmd++;
             }
@@ -145,8 +211,9 @@ function Flyer(startX, startY, startTheta, color, v, r, modifier) {
             this.y = half_canvasHeight;
         }
 
-        if (this.cur_cmd > 3) {
+        if (this.cur_cmd >= pattern.length) {
             this.cur_cmd = 0;
+            this.start_pattern = true;
         }
     }
 
@@ -177,19 +244,17 @@ function init() {
     var dateTemp = new Date();
     lastTime = dateTemp.getTime();
 
-    var modifier = 0;
-
     fliers0 = new Array();
     fliers1 = new Array();
 
     for (var i=0; i<numFliers; i++) {
         fliers0[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 40, 
-            0, "rgb(255, 0, 0)", 10, 0, modifier);
+            0, "rgb(255, 0, 0)", 10, 0);
 
         fliers0[i].cur_pattern = pattern_0;
 
         fliers1[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 20,
-                0, "rgb(255, 255, 0)", 10, 20, modifier);
+                0, "rgb(255, 255, 0)", 10, 20);
 
         modifier = i * 20;
     }
