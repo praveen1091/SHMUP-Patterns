@@ -27,10 +27,10 @@ const LOOP = 4;
 const ENTER_LEFT = 5;
 const EXIT_RIGHT = 6;
 const TRANSLATE_TO = 7;
+const SET_POS = 8;
 
 
 var pattern_0 = [
-
     {
         "cmd" : ENTER_LEFT,
         "v" : 10.0,
@@ -40,7 +40,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE_TO,
         "v" : 10.0,
-        "x" : 0
+        "x" : -200.0
     },
 
     {
@@ -53,7 +53,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 20.0
+        "durration" : 10.0
     },
 
 
@@ -112,11 +112,12 @@ $(document).ready(function() {
     animate();
 
     pattern_0[0]["x"] = -half_canvasWidth;
-    pattern_0[5]["x"] = half_canvasWidth;
+    pattern_0[9]["x"] = half_canvasWidth;
 });
 
 function Flyer(startX, startY, startTheta, color, v, r) {
-   
+    this.startX = startX;
+    this.startY = startY;
     this.x = startX;
     this.y = startY;
     this.theta = startTheta;
@@ -131,6 +132,7 @@ function Flyer(startX, startY, startTheta, color, v, r) {
     this.reset_loop = true;
     this.cur_pattern = null;
     this.cur_cmd = 0;
+    this.bounds_check = false;
     this.start_pattern = true;
 
     this.update = function(dt) {
@@ -141,12 +143,20 @@ function Flyer(startX, startY, startTheta, color, v, r) {
         switch (pattern[i]["cmd"]) {
             
             case ENTER_LEFT:
+            this.v = pattern[i]["v"];
+            if (this.x >= pattern[i]["x"]) {
+                this.cur_cmd++;
+                this.start_pattern = false;
+            }
+            break;
+
             case EXIT_RIGHT:
             this.v = pattern[i]["v"];
             if (this.x >= pattern[i]["x"]) {
                 this.cur_cmd++;
             }
             break;
+
 
             case TRANSLATE_TO:
             this.v = pattern[i]["v"];
@@ -188,33 +198,42 @@ function Flyer(startX, startY, startTheta, color, v, r) {
             break;
         }
 
+        if (this.cur_cmd >= pattern.length) {
+            this.cur_cmd = 0;
+            this.start_pattern = true;
+            this.bounds_check = false;
+            this.reset();
+        }
+
+        if (this.bounds_check) {
+            if (this.x > half_canvasWidth) {
+                this.x = -half_canvasWidth;
+            }
+            else if (!this.start_pattern && (this.x < -half_canvasWidth)) {
+                this.x = half_canvasWidth;
+            }
+
+            if (this.y > half_canvasHeight) {
+                this.y = -half_canvasHeight;
+            }
+            else if (this.y < -half_canvasHeight) {
+                this.y = half_canvasHeight;
+            }
+        }
+
+        if (this.start_pattern == false) {
+            this.bounds_check = true;
+        }
+
         this.cosine = Math.cos(this.theta);
         this.sine = Math.sin(this.theta);
         this.x = this.v * this.cosine + this.x;
         this.y = this.v * this.sine + this.y;
+    }
 
-        if (this.x > half_canvasWidth) {
-            this.x = -half_canvasWidth;
-        }
-        else if (!this.start_pattern && (this.x < -half_canvasWidth)) {
-            this.x = half_canvasWidth;
-        }
-        else if (this.start_pattern && (this.x > -half_canvasWidth)) {
-            this.start_pattern = false;
-        }
-
-
-        if (this.y > half_canvasHeight) {
-            this.y = -half_canvasHeight;
-        }
-        else if (this.y < -half_canvasHeight) {
-            this.y = half_canvasHeight;
-        }
-
-        if (this.cur_cmd >= pattern.length) {
-            this.cur_cmd = 0;
-            this.start_pattern = true;
-        }
+    this.reset = function() {
+        this.x = -half_canvasWidth;
+        this.y = this.startY;
     }
 
     this.mirror = function(leader) {
