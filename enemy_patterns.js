@@ -19,15 +19,15 @@ var fliers1;
 
 var numFliers = 10;
 
-const TRANSLATE = 0;
-const ROTATE = 1;
-const ROTATE_TRANSLATE = 2;
-const PAUSE = 3;
-const LOOP = 4;
-const ENTER_LEFT = 5;
-const EXIT_RIGHT = 6;
-const TRANSLATE_TO = 7;
-const SET_POS = 8;
+var TRANSLATE = 0;
+var ROTATE = 1;
+var ROTATE_TRANSLATE = 2;
+var PAUSE = 3;
+var LOOP = 4;
+var ENTER_LEFT = 5;
+var EXIT_RIGHT = 6;
+var TRANSLATE_TO = 7;
+var SET_POS = 8;
 
 
 var pattern_0 = [
@@ -40,7 +40,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE_TO,
         "v" : 10.0,
-        "x" : -200.0
+        "x" : -250.0
     },
 
     {
@@ -55,7 +55,6 @@ var pattern_0 = [
         "v" : 10.0,
         "durration" : 10.0
     },
-
 
     {
         "cmd" : ROTATE,
@@ -77,14 +76,12 @@ var pattern_0 = [
         "durration" : 20.0
     },
 
-
     {
         "cmd" : ROTATE,
         "v" : 10.0,
         "theta" : Math.PI / 20,
         "max" : Math.PI / 2 
     },
-
 
     {
         "cmd" : ROTATE,
@@ -111,9 +108,8 @@ $(document).ready(function() {
     init();
     animate();
 
-    pattern_0[0]["x"] = -half_canvasWidth;
-    pattern_0[9]["x"] = half_canvasWidth;
 });
+
 
 function Flyer(startX, startY, startTheta, color, v, r) {
     this.startX = startX;
@@ -278,6 +274,17 @@ function init() {
         modifier = i * 20;
     }
 
+    // adjust pattern parameters
+    for (var i=0; i<pattern_0.length; i++) {
+        switch (pattern_0[i]["cmd"]) {
+        case ENTER_LEFT:
+        pattern_0[i]["x"] = -half_canvasWidth;
+        break;
+        case EXIT_RIGHT:
+        pattern_0[i]["x"] = half_canvasWidth;
+        break;
+        }
+    }
 }
 
 function animate() {
