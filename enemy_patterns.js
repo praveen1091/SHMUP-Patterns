@@ -19,16 +19,14 @@ var fliers1;
 
 var numFliers = 10;
 
-const TRANSLATE = 0;
-const ROTATE = 1;
-const ROTATE_TRANSLATE = 2;
-const PAUSE = 3;
-const LOOP = 4;
-const ENTER_LEFT = 5;
-const EXIT_RIGHT = 6;
-const TRANSLATE_TO = 7;
-const SET_POS = 8;
-
+var TRANSLATE = 0;
+var ROTATE = 1;
+var ROTATE_TRANSLATE = 2;
+var LOOP = 4;
+var ENTER_LEFT = 5;
+var EXIT_RIGHT = 6;
+var TRANSLATE_TO = 7;
+var SET_POS = 8;
 
 var pattern_0 = [
     {
@@ -77,7 +75,6 @@ var pattern_0 = [
         "durration" : 20.0
     },
 
-
     {
         "cmd" : ROTATE,
         "v" : 10.0,
@@ -100,22 +97,33 @@ var pattern_0 = [
     }
 ];
 
-
 $(document).ready(function() {
+
     canvas = $("#myCanvas");
     context = canvas.get(0).getContext("2d");
     canvasHeight = canvas.height();
     canvasWidth = canvas.width();
     half_canvasHeight = canvasHeight / 2;
     half_canvasWidth = canvasWidth / 2;
+
     init();
     animate();
 
-    pattern_0[0]["x"] = -half_canvasWidth;
-    pattern_0[9]["x"] = half_canvasWidth;
+    for (var i=0; i<pattern_0.length; i++) {
+        switch (pattern_0[i]["cmd"]) {
+        case ENTER_LEFT:
+            pattern_0[i]["x"] = -half_canvasWidth;
+        break;
+        case EXIT_RIGHT:
+            pattern_0[i]["x"] = half_canvasWidth;
+        break;
+        }
+    }
+        
 });
 
 function Flyer(startX, startY, startTheta, color, v, r) {
+
     this.startX = startX;
     this.startY = startY;
     this.x = startX;
@@ -128,12 +136,8 @@ function Flyer(startX, startY, startTheta, color, v, r) {
     this.sine = Math.sin(this.theta);
     this.dt = 0;
     this.dtheta = 0;
-    this.loop = false;
-    this.reset_loop = true;
     this.cur_pattern = null;
     this.cur_cmd = 0;
-    this.bounds_check = false;
-    this.start_pattern = true;
 
     this.update = function(dt) {
 
@@ -194,41 +198,17 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 
             break;
 
-            case PAUSE:
-            break;
-        }
-
-        if (this.cur_cmd >= pattern.length) {
-            this.cur_cmd = 0;
-            this.start_pattern = true;
-            this.bounds_check = false;
-            this.reset();
-        }
-
-        if (this.bounds_check) {
-            if (this.x > half_canvasWidth) {
-                this.x = -half_canvasWidth;
-            }
-            else if (!this.start_pattern && (this.x < -half_canvasWidth)) {
-                this.x = half_canvasWidth;
-            }
-
-            if (this.y > half_canvasHeight) {
-                this.y = -half_canvasHeight;
-            }
-            else if (this.y < -half_canvasHeight) {
-                this.y = half_canvasHeight;
-            }
-        }
-
-        if (this.start_pattern == false) {
-            this.bounds_check = true;
         }
 
         this.cosine = Math.cos(this.theta);
         this.sine = Math.sin(this.theta);
         this.x = this.v * this.cosine + this.x;
         this.y = this.v * this.sine + this.y;
+
+        if (this.cur_cmd >= pattern.length) {
+            this.cur_cmd = 0;
+            this.reset();
+        }
     }
 
     this.reset = function() {
@@ -266,16 +246,20 @@ function init() {
     fliers0 = new Array();
     fliers1 = new Array();
 
+    var startTheta = 0.0;
+    var startX = -half_canvasWidth;
+    var startY = half_canvasHeight - 40;
+
     for (var i=0; i<numFliers; i++) {
-        fliers0[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 40, 
-            0, "rgb(255, 0, 0)", 10, 0);
+        fliers0[i] = new Flyer(startX, startY,
+            startTheta, "rgb(255, 0, 0)", 10, 0);
 
         fliers0[i].cur_pattern = pattern_0;
 
-        fliers1[i] = new Flyer(-half_canvasWidth - (i * 20), half_canvasHeight - 20,
-                0, "rgb(255, 255, 0)", 10, 20);
+        fliers1[i] = new Flyer(0, 0,
+                startTheta, "rgb(255, 255, 0)", 10, 20);
 
-        modifier = i * 20;
+        startX = -half_canvasWidth - (i * 20.0);
     }
 
 }
