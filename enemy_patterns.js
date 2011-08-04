@@ -51,9 +51,8 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 10.0
+        "frames" : 10.0
     },
-
 
     {
         "cmd" : ROTATE,
@@ -72,7 +71,7 @@ var pattern_0 = [
     {
         "cmd" : TRANSLATE,
         "v" : 10.0,
-        "durration" : 20.0
+        "frames" : 20.0
     },
 
     {
@@ -81,7 +80,6 @@ var pattern_0 = [
         "theta" : Math.PI / 20,
         "max" : Math.PI / 2 
     },
-
 
     {
         "cmd" : ROTATE,
@@ -172,7 +170,7 @@ function Flyer(startX, startY, startTheta, color, v, r) {
             case TRANSLATE:
             this.v = pattern[i]["v"];
             this.dt += v;
-            if (this.dt >= pattern[i]["durration"]) {
+            if (this.dt >= pattern[i]["frames"]) {
                 this.dt = 0;
                 this.cur_cmd++;
             }
@@ -218,8 +216,8 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 
     this.mirror = function(leader) {
         this.theta = leader.theta;
-        this.x = r * -leader.sine + leader.x;
-        this.y = r * leader.cosine + leader.y;
+        this.x = 20.0 * -leader.sine + leader.x;
+        this.y = 20.0 * leader.cosine + leader.y;
     }
 
     this.drawCenteredRect = function(x, y, w, h) {
@@ -240,8 +238,7 @@ function Flyer(startX, startY, startTheta, color, v, r) {
 }
 
 function init() {
-    var dateTemp = new Date();
-    lastTime = dateTemp.getTime();
+    lastTime = +new Date();
 
     fliers0 = new Array();
     fliers1 = new Array();
@@ -256,17 +253,15 @@ function init() {
 
         fliers0[i].cur_pattern = pattern_0;
 
-        fliers1[i] = new Flyer(0, 0,
+        fliers1[i] = new Flyer(startX, startY,
                 startTheta, "rgb(255, 255, 0)", 10, 20);
 
         startX = -half_canvasWidth - (i * 20.0);
     }
-
 }
 
 function animate() {
-    var dateTemp = new Date();
-    var curTime = dateTemp.getTime();
+    var curTime = +new Date();
     var delta = curTime - lastTime;
     lastTime = curTime;
 
