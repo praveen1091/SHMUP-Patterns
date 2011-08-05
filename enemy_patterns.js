@@ -26,14 +26,11 @@ var FormationInitFunc = null;
 
 var TRANSLATE = 0;
 var ROTATE = 1;
-var ROTATE_TRANSLATE = 2;
-var LOOP = 4;
+var TRANSLATE_TO = 2;
+var EXIT_LEFT = 3;
+var EXIT_RIGHT = 4;
 var ENTER_LEFT = 5;
-var EXIT_RIGHT = 6;
-var TRANSLATE_TO = 7;
-var SET_POS = 8;
-var ENTER_RIGHT = 9;
-var EXIT_LEFT = 10;
+var ENTER_RIGHT = 6;
 
 var pattern_0 = [
     {
@@ -169,14 +166,120 @@ var pattern_1 = [
     }
 ];
 
+var pattern_2 = [
+    {
+        "cmd" : ENTER_LEFT,
+        "v" : 10.0,
+        "x" : 0
+    },
+
+    {
+        "cmd" : TRANSLATE_TO,
+        "v" : 10.0,
+        "x" : -200.0
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : -Math.PI / 20,
+        "max" : -Math.PI / 2 
+    },
+
+    {
+        "cmd" : TRANSLATE,
+        "v" : 10.0,
+        "frames" : 10.0
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : Math.PI / 2 
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : -Math.PI / 20,
+        "max" : -Math.PI / 2 
+    },
+
+    {
+        "cmd" : TRANSLATE,
+        "v" : 10.0,
+        "frames" : 20.0
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : Math.PI / 2 
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : -Math.PI / 20,
+        "max" : (-Math.PI * 2)
+    },
+];
+
+
+var pattern_3 = [
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : Math.PI / 2 
+    },
+
+    {
+        "cmd" : TRANSLATE,
+        "v" : 10.0,
+        "frames" : 10.0
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : Math.PI / 2 
+    },
+
+    {
+        "cmd" : TRANSLATE,
+        "v" : 10.0,
+        "frames" : 10.0
+    },
+
+    {
+        "cmd" : ROTATE,
+        "v" : 10.0,
+        "theta" : Math.PI / 20,
+        "max" : 2 * Math.PI 
+    },
+
+    {
+        "cmd" : EXIT_LEFT,
+        "v" : 20.0,
+        "x" : 0
+    }
+];
 
 
 var formationPatternQueue0 = new Array(pattern_0);
 var formationPatternQueue1 = new Array(pattern_1);
+var formationPatternQueue2 = new Array(pattern_2, pattern_3);
 
 var patterns = new Array(
         pattern_0,
-        pattern_1
+        pattern_1,
+        pattern_2,
+        pattern_3
         );
 
 
@@ -464,6 +567,36 @@ function initFormation1() {
     FormationInitFunc = initFormation1;
 }
 
+function initFormation2() {
+
+    var startTheta = 0.0;
+    var startX = -HalfCanvasWidth;
+    var startY = HalfCanvasHeight - 40;
+
+    for (var i=0; i<MaxShipsPerFormation; i++) {
+        ships0[i].setPos(startX, startY);
+        ships0[i].setDir(startTheta);
+        ships0[i].setColor("rgb(255, 0, 0)");
+        ships0[i].setPatternQueue(formationPatternQueue2);
+        ships0[i].alive = true;
+        ships0[i].leader = null;
+
+        ships1[i].setPos(startX, startY);
+        ships1[i].setColor("rgb(255, 255, 0)");
+        ships1[i].setFormationOffset(20.0);
+
+        ships1[i].alive = true;
+        ships1[i].leader = ships0[i];
+
+        startX = -HalfCanvasWidth - (i * 20.0);
+    }
+
+    NumShipsLeft = MaxShipsPerFormation;
+    MirrorFormation = true;
+    FormationInitFunc = initFormation2;
+}
+
+
 
 function init() {
     lastTime = +new Date();
@@ -478,7 +611,7 @@ function init() {
         ships0[i].id = "id ship1 #" + i;
     }
 
-    initFormation1();
+    initFormation0();
 }
 
 function animate() {
