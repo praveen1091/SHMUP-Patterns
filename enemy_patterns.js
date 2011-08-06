@@ -314,32 +314,51 @@ $(document).ready(function() {
             }
         }
     }
+
+    var f0 = $("#f0");
+    var f1 = $("#f1");
+    var f2 = $("#f2");
+
+    f0.click(function() {
+        initFormation0();
+    });
+    f1.click(function() {
+        initFormation1();
+    });
+    f2.click(function() {
+        initFormation2();
+    });
 });
 
 function Ship() {
 
-    this.x = null;
-    this.y = null;
-    this.color = null;
-    this.v = null;
-    this.theta = null;
-    this.cosine = null;
-    this.sine = null;
 
-    this.dt = 0;
-    this.dtheta = 0;
+    this.reset = function() {
+        this.x = null;
+        this.y = null;
+        this.color = null;
+        this.v = null;
+        this.theta = null;
+        this.cosine = null;
+        this.sine = null;
+
+        this.dt = 0;
+        this.dtheta = 0;
+        
+        this.leader = null;
+        this.formation_offset = null;
+
+        this.cur_pattern = null;
+        this.cur_cmd = 0;
+     
+        this.patternQueue;
+        this.patternQueuePos;
+
+        this.alive = false;
+    }
     
-    this.leader = null;
-    this.formation_offset = null;
+    this.reset();
 
-    this.cur_pattern = null;
-    this.cur_cmd = 0;
- 
-    this.patternQueue;
-    this.patternQueuePos;
-
-    this.alive = false;
-    
     this.setPos = function(x, y) {
         this.x = x;
         this.y = y;
@@ -517,6 +536,10 @@ function initFormation0() {
     var startY = HalfCanvasHeight - 40;
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
+        
+        ships0[i].reset();
+        ships1[i].reset();
+
         ships0[i].setPos(startX, startY);
         ships0[i].setDir(startTheta);
         ships0[i].setColor("rgb(255, 0, 0)");
@@ -546,6 +569,10 @@ function initFormation1() {
     var startY = HalfCanvasHeight - 40;
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
+
+        ships0[i].reset();
+        ships1[i].reset();
+
         ships0[i].setPos(startX, startY);
         ships0[i].setDir(startTheta);
         ships0[i].setColor("rgb(255, 0, 0)");
@@ -574,6 +601,10 @@ function initFormation2() {
     var startY = HalfCanvasHeight - 40;
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
+
+        ships0[i].reset();
+        ships1[i].reset();
+
         ships0[i].setPos(startX, startY);
         ships0[i].setDir(startTheta);
         ships0[i].setColor("rgb(255, 0, 0)");
@@ -596,8 +627,6 @@ function initFormation2() {
     FormationInitFunc = initFormation2;
 }
 
-
-
 function init() {
     lastTime = +new Date();
 
@@ -611,7 +640,7 @@ function init() {
         ships0[i].id = "id ship1 #" + i;
     }
 
-    initFormation0();
+    initFormation1();
 }
 
 function animate() {
