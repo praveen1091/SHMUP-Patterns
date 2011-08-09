@@ -605,6 +605,7 @@ function initFormation1() {
     }
 
     NumShipsLeft = MaxShipsPerFormation * 2;
+    MirrorFormation = false;
     FormationInitFunc = initFormation1;
 }
 
