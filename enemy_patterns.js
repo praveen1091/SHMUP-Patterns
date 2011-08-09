@@ -1,4 +1,6 @@
 /* vim: set ts=4 sw=4 sta et sts=4 ai ci: */
+(function() {
+
 var canvas;
 var context;
 var canvasHeight;
@@ -282,10 +284,11 @@ var patterns = new Array(
         pattern_3
         );
 
+var doAnimation = false;
 
 $(document).ready(function() {
 
-    canvas = $("#myCanvas");
+    canvas = $("#g1_myCanvas");
     context = canvas.get(0).getContext("2d");
     canvasHeight = canvas.height();
     canvasWidth = canvas.width();
@@ -293,7 +296,10 @@ $(document).ready(function() {
     HalfCanvasWidth = canvasWidth / 2;
 
     init();
-    animate();
+
+    // clear canvas
+    context.fillStyle = "rgb(0, 0, 0)";
+    context.fillRect(0, 0, canvasWidth, canvasHeight);
 
     for (var i=0; i<patterns.length; i++) {
         var pattern = patterns[i];
@@ -315,9 +321,17 @@ $(document).ready(function() {
         }
     }
 
-    var f0 = $("#f0");
-    var f1 = $("#f1");
-    var f2 = $("#f2");
+    var toggleBtn = $("#g1_toggleBtn");
+    var f0 = $("#g1_f0");
+    var f1 = $("#g1_f1");
+    var f2 = $("#g1_f2");
+
+    toggleBtn.click(function() {
+        doAnimation = !doAnimation;
+        if (doAnimation) {
+            animate();
+        }
+    });
 
     f0.click(function() {
         initFormation0();
@@ -537,6 +551,8 @@ function initFormation0() {
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
         
+        startX = -HalfCanvasWidth - (i * 20.0);
+
         ships0[i].reset();
         ships1[i].reset();
 
@@ -553,8 +569,6 @@ function initFormation0() {
 
         ships1[i].alive = true;
         ships1[i].leader = ships0[i];
-
-        startX = -HalfCanvasWidth - (i * 20.0);
     }
 
     NumShipsLeft = MaxShipsPerFormation;
@@ -569,6 +583,8 @@ function initFormation1() {
     var startY = HalfCanvasHeight - 40;
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
+
+        startX = -HalfCanvasWidth - (i * 20.0);
 
         ships0[i].reset();
         ships1[i].reset();
@@ -586,8 +602,6 @@ function initFormation1() {
         ships1[i].setPatternQueue(formationPatternQueue1);
         ships1[i].alive = true;
         ships1[i].leader = null;
-
-        startX = -HalfCanvasWidth - (i * 20.0);
     }
 
     NumShipsLeft = MaxShipsPerFormation * 2;
@@ -601,6 +615,8 @@ function initFormation2() {
     var startY = HalfCanvasHeight - 40;
 
     for (var i=0; i<MaxShipsPerFormation; i++) {
+
+        startX = -HalfCanvasWidth - (i * 20.0);
 
         ships0[i].reset();
         ships1[i].reset();
@@ -618,8 +634,6 @@ function initFormation2() {
 
         ships1[i].alive = true;
         ships1[i].leader = ships0[i];
-
-        startX = -HalfCanvasWidth - (i * 20.0);
     }
 
     NumShipsLeft = MaxShipsPerFormation;
@@ -643,7 +657,7 @@ function init() {
     initFormation1();
 }
 
-function animate() {
+function update() {
     var curTime = +new Date();
     var delta = curTime - lastTime;
     lastTime = curTime;
@@ -658,8 +672,6 @@ function animate() {
         ships1[i].update(delta);
     }
 
-    setTimeout(animate, 33);
-
     if (NumShipsLeft < 1) {
         if (MirrorFormation) {
             NumShipsLeft = MaxShipsPerFormation;
@@ -670,3 +682,12 @@ function animate() {
         FormationInitFunc();
     }
 }
+
+function animate() {
+    update();
+    if (doAnimation) {
+        setTimeout(animate, 33);
+    }
+}
+
+})();
