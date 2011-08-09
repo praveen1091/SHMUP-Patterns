@@ -9,13 +9,6 @@ var HalfCanvasHeight;
 var HalfCanvasWidth;
 var lastTime;
 
-var x0 = 0;
-var y0 = 0;
-var x1 = 0;
-var y1 = 0;
-var dt = 0;
-var r = 20.0;
-
 var ships0;
 var ships1;
 
